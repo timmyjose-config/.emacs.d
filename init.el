@@ -29,6 +29,7 @@
   (unless (package-installed-p package)
     (package-install package)))
 
+
 ;;; Common Setup
 
 ;; hide menubars. toolbars, and scrollbar
@@ -43,6 +44,10 @@
 (setq
  split-width-threshold 0
  split-height-threshold nil)
+
+;; set preferred font
+
+(add-to-list 'default-frame-alist '(font . "Ubuntu Mono-14"))
 
 ;; no backups allowed
 (setq make-backup-files nil)
@@ -67,6 +72,9 @@
 ;; enable helm-mode and bind M-x to helm-M-x
 (helm-mode 1)
 (global-set-key (kbd "M-x") 'helm-M-x)
+; fix annoying quirky TAB behaviour 
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+(define-key helm-map (kbd "C-z") 'helm-select-action)
 
 ;; use company-mode everywhere
 (add-hook 'after-init-hook 'global-company-mode)
