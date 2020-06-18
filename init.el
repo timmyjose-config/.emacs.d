@@ -32,6 +32,9 @@
 
 ;;; Common Setup
 
+;; load up cl.el
+(eval-when-compile (require 'cl))
+
 ;; hide menubars. toolbars, and scrollbar
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -44,6 +47,23 @@
 (setq
  split-width-threshold 0
  split-height-threshold nil)
+
+;; use windmove everywhere
+
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
+
+(defun ignore-windmove-error (fn)
+  (lexical-let ((fn fn))
+    (lambda ()
+      (interactive)
+      (ignore-errors
+        (funcall fn)))))
+
+(global-set-key [s-left] (ignore-windmove-error 'windmove-left))
+(global-set-key [s-right] (ignore-windmove-error 'windmove-right))
+(global-set-key [s-up] (ignore-windmove-error 'windmove-up))
+(global-set-key [s-down] (ignore-windmove-error 'windmove-down))
 
 ;; set preferred font
 
