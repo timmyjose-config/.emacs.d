@@ -16,6 +16,7 @@
         helm-ag
         helm-company
         helm-projectile
+        magit
         markdown-mode
 	paredit
         projectile
@@ -114,7 +115,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
+    (magit markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
 
 (global-set-key (kbd "M-g") 'helm-ag)
 
