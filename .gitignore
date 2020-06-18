@@ -6,3 +6,4 @@ tramp
 **/.\#*
 **/*.*~
 **/elpa
+**/projectile-bookmarks.eld
