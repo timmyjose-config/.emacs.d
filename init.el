@@ -2,25 +2,32 @@
 
 (setq package-archives
       '(("melpa stable" . "https://stable.melpa.org/packages/")
-	("melpa" . "https://melpa.org/packages/"))
+	("melpa" . "https://melpa.org/packages/")
+        ("gnu" . "https://elpa.gnu.org/packages/"))
       package-archive-priorities
-      '(("melpa stable" . 100)
-	("melpa" . 50)))
+      '(("melpa" . 100)
+	("melpa stable" . 50)
+        ("elpa" . 25)))
+
 
 ;;; setup the required packages
 ;;; and install them if not found
 (setq packages-list
       '(company
         exec-path-from-shell
+        flycheck
+        flycheck-package
         helm
         helm-ag
         helm-company
         helm-projectile
         magit
         markdown-mode
+        package-lint
 	paredit
         projectile
-	slime))
+	slime
+        zig-mode))
 
 (package-initialize)
 
@@ -31,6 +38,9 @@
   (unless (package-installed-p package)
     (package-install package)))
 
+;; flycheck-package config
+(eval-after-load 'flycheck
+    '(flycheck-package-setup))
 
 ;;; Common Setup
 
@@ -115,7 +125,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (magit markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
+    (package-lint magit markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
 
 (global-set-key (kbd "M-g") 'helm-ag)
 
@@ -126,6 +136,8 @@
 ;; highlight matching parens
 (show-paren-mode 1)
 
+;; enable flycheck
+(add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;;; Language-specific Hooks
 
