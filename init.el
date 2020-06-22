@@ -1,4 +1,17 @@
+;;; init.el --- My Emacs configuration -*- lexical-binding: t -*-
+
+;; Author: Timmy Jose <zoltan.jose@gmail.com>
+;; Maintainer: Timmy Jose <zoltan.jose@gmail.com>
+;; Version: 1.0
+;; Homepage: https://github.com/timmyjose-config/.emacs.d
+;; Package-Requires: ((emacs "24.3"))
+
+;;; Commentary:
+;;   Configuring Emacs from scratch.  The idea is to keep vanilla as much as possible.
+
 (require 'package)
+
+;;; Code:
 
 (setq package-archives
       '(("melpa stable" . "https://stable.melpa.org/packages/")
@@ -12,40 +25,54 @@
 
 ;;; setup the required packages
 ;;; and install them if not found
-(setq packages-list
+(defvar packages-list
       '(company
         exec-path-from-shell
         flycheck
         flycheck-package
+        haskell-mode
         helm
         helm-ag
         helm-company
         helm-projectile
+        lox-mode
         magit
         markdown-mode
         package-lint
 	paredit
         projectile
+        rust-mode
 	slime
         zig-mode))
 
 (package-initialize)
 
+;; only used during initial setup
+
 (unless package-archive-contents
   (package-refresh-contents))
 
-(dolist (package packages-list)
-  (unless (package-installed-p package)
-    (package-install package)))
+;; this will check whether a package list refresh
+;; is required or not, and then install the package
+;; if not already installed.
+
+(let ((packages-refreshed nil))
+  (dolist (package packages-list)
+    (unless (package-installed-p package)
+      (unless packages-refreshed
+        (package-refresh-contents)
+        (setq packages-refreshed t))
+      (package-install package))))
 
 ;; flycheck-package config
 (eval-after-load 'flycheck
-    '(flycheck-package-setup))
+  '(flycheck-package-setup))
+
 
 ;;; Common Setup
 
 ;; load up cl.el
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 ;; hide menubars. toolbars, and scrollbar
 (menu-bar-mode -1)
@@ -66,11 +93,11 @@
   (windmove-default-keybindings))
 
 (defun ignore-windmove-error (fn)
-  (lexical-let ((fn fn))
-    (lambda ()
-      (interactive)
-      (ignore-errors
-        (funcall fn)))))
+  "Mute errors when no other window exists while invoking FN."
+  (lambda ()
+    (interactive)
+    (ignore-errors
+      (funcall fn))))
 
 (global-set-key [s-left] (ignore-windmove-error 'windmove-left))
 (global-set-key [s-right] (ignore-windmove-error 'windmove-right))
@@ -104,7 +131,7 @@
 ;; enable helm-mode and bind M-x to helm-M-x
 (helm-mode 1)
 (global-set-key (kbd "M-x") 'helm-M-x)
-; fix annoying quirky TAB behaviour 
+; fix annoying quirky TAB behaviour
 (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
 (define-key helm-map (kbd "C-z") 'helm-select-action)
 
@@ -123,9 +150,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(lox-bin "clox")
  '(package-selected-packages
    (quote
-    (package-lint magit markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
+    (lox-mode package-lint magit markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
 
 (global-set-key (kbd "M-g") 'helm-ag)
 
@@ -139,21 +167,29 @@
 ;; enable flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
+
 ;;; Language-specific Hooks
+
+;; practically every language major mode extends prog-mode
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (electric-pair-mode 1)))
 
 ;; elisp
 (add-hook 'emacs-lisp-mode-hook
 	  (lambda ()
 	    (paredit-mode 1)
-	    (setq indent-tabs-mode nil)
-	    (define-key emacs-lisp-mode-map
-	      "\C-x\C-e" 'pp-eval-last-sexp)))
+	    (define-key emacs-lisp-mode-map (kbd "C-x C-e") 'pp-eval-last-sexp)))
 
-;; Common Lisp
-(add-hook 'common-lisp-mode-hook
+;; Rust
+(add-hook 'rust-mode-hook
           (lambda ()
-            (paredit-mode 1)
-            (setq indent-tabs-mode nil)))
+            (setq rust-format-on-save t)
+            (define-key rust-mode-map (kbd "C-c C-c") 'rust-compile)
+            (define-key rust-mode-map (kbd "C-c C-r") 'rust-run)
+            (define-key rust-mode-map (kbd "C-c C-t") 'rust-test)
+            (define-key rust-mode-map (kbd "C-c C-k") 'rust-run-clippy)))
 
 
 (custom-set-faces
@@ -162,3 +198,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(provide 'init)
+
+;;; init.el ends here
