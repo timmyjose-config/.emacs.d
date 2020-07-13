@@ -28,8 +28,11 @@
 (defvar packages-list
       '(company
         exec-path-from-shell
+        eclipse-theme
         flycheck
         flycheck-package
+        github-theme
+        green-phosphor-theme
         haskell-mode
         helm
         helm-ag
@@ -88,7 +91,6 @@
  split-height-threshold nil)
 
 ;; use windmove everywhere
-
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
 
@@ -150,10 +152,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("1d78d6d05d98ad5b95205670fe6022d15dabf8d131fe087752cc55df03d88595" "08765d801b06462a3ce7e414cdb747436ccaf0c073350be201d8f87bd0481435" default)))
  '(lox-bin "clox")
  '(package-selected-packages
    (quote
-    (lox-mode package-lint magit markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
+    (green-phosphor-theme github-theme lox-mode package-lint magit markdown-mode markdown helm-ag helm-projectile projectile projectile-mode helm-company helm company company-mode exec-path-from-shell slime))))
 
 (global-set-key (kbd "M-g") 'helm-ag)
 
@@ -181,6 +186,16 @@
 	  (lambda ()
 	    (paredit-mode 1)
 	    (define-key emacs-lisp-mode-map (kbd "C-x C-e") 'pp-eval-last-sexp)))
+
+;; common lisp
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (paredit-mode 1)))
+
+;; slime
+(add-hook 'slime-mode-hook
+          (lambda ()
+            (paredit-mode 1)))
 
 ;; Rust
 (add-hook 'rust-mode-hook
